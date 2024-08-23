@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/redux@4.1.0/dist/redux.min.js"></script>
+    <script src="https://unpkg.com/react-redux@7.2.4/dist/react-redux.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <title>The React Demo of Kaz</title>
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+    <div id="header"></div>
+    <div class="parallax-container">
+        <div class="parallax-layer background" id="experience">
+        </div>
+    </div>
+    <div class="texture" id="tx"></div>
+    <script src="js/experience.js"></script>
+    <script>
+
+
+    </script>
+    <script type="text/babel">
+        const xp = document.getElementById('experience');
+        const root = ReactDOM.createRoot(xp);
+        const topper = ReactDOM.createRoot(document.getElementById("header"));
+
+        // This page doesn't need Redux. 
+        // Its state situation is not complex enough to justify this additional code and overhead.
+        // But I want to demonstrate my knowledge of it.
+        const { createStore } = Redux;
+        const {Provider, useSelector, useDispatch} = ReactRedux;
+        const {createRoot} = ReactDOM;
+
+        const filterAction = (skill) => ({type: 'FILTER_BY_SKILL', skill });
+        const initialState = { 
+            jobs: experience, filter: '',
+            listing: false
+        };
+
+        const rootReducer = (state = initialState, action) => {
+            switch (action.type) {
+                case 'FILTER_BY_SKILL':
+                    return {
+                        ...state, 
+                        jobs: initialState.jobs.filter(job => 
+                            job.skills.some(skill => skill.toLowerCase().includes(action.skill.toLowerCase()))
+                        )
+                    };
+                case 'TOGGLE_SKILLS':
+                    return {
+                        ...state,
+                        listing: !state.listing
+                    }
+                default:
+                    return state;
+            }
+        }
+
+        const store = createStore(rootReducer);
+
+
+         const JobList = () => {
+            const jobs = useSelector(state => state.jobs);
+            return (
+                <>
+                    {jobs.map(job => <JobTile key={job.id} {...job} />)}
+                </>
+            );
+        };
+        const JobTile = (props) => {
+            return (
+                <div id={props.id} className="job-tile">
+                    <h3>{props.company}</h3>
+                    <h4>{props.position}</h4>
+                    <p>{props.location}</p>
+                    <p>{props.duration}</p>
+                    <p>{props.description}</p>
+                    <p><SkillList skills={props.skills} /></p>
+                </div>
+            )
+        };
+       const SkillList = ({skills}) => {
+        const dispatch = useDispatch();
+            return (
+                <>
+                    {skills.map((skill, index) => (
+                        <div key={index} title="Click to filter resume by this skill"
+                            onClick={(e) => dispatch(filterAction(skill))} className="skill">{skill}</div>
+                    ))}
+                </>
+            )
+        }
+
+        const FilterInput = () => {
+            const dispatch = useDispatch();
+            return(
+                <>
+                <span>The Resume of Kaz</span>
+                <input type="text" className="filter" onChange={(e) => dispatch(filterAction(e.target.value))} placeholder="Filter by skill..." />
+                </>
+            );
+        };
+
+        const texture = ((c) => {
+            // Like everything in this demo, this background-filling function started out as a quick filler and kept growing more fun to tweak
+            const tx = document.getElementById("tx");
+            const charWidth = 4; 
+            const charHeight = 8; 
+            const charsPerLine = Math.floor(window.innerWidth / charWidth);
+            const linesPerScreen = Math.ceil(window.innerHeight / charHeight);
+
+            let content = '';
+            for (let i = 0; i < linesPerScreen; i++) 
+                content += c.repeat(charsPerLine) + '\n';
+            tx.textContent = content;
+        })("░▒");
+
+        topper.render(<Provider store={store}>
+                <FilterInput />
+            </Provider>);
+        root.render(<Provider store={store}>
+                <JobList />
+            </Provider>
+        );
+    </script>
+</body>
+</html>
