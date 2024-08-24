@@ -1,7 +1,8 @@
-This is A VERY SIMPLE demo of my resume in a single, CSR React/Redux file using Babel, all through CDN. 
+This is fork from a CSR React/Redux demo file using Babel, all through CDN, that I had built
 
-It is meant as a code sample, showing my use of React and Redux, NOT an example of my web design skills.
+It replaces React with Web Components.
 
-In it, I use client-side rendering, so that you can download all of the code and run it as a single file, without having to deal with the server settings.
+This is a more modern, universal way of doing something like React but better.
 
-You can view the running code at https://kazvorpal.github.io/resume-react/
+You can view the running code at https://kazvorpal.github.io/resume-webcomponents/
+
